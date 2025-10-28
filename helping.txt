@@ -1,0 +1,11 @@
+
+.\venv\Scripts\activate
+uvicorn main:app --reload
+
+
+Possible: 17,827 occurrences.
+No Effect: 2,374 occurrences.
+Positive: 1,915 occurrences.
+Negative: 1,437 occurrences.
+Harmful: 393 occurrences.
+possible: 4 occurrences.

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Food Interaction Prediction System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <h1 class="header__title">
+                <i class="fas fa-flask"></i>
+                Drug-Food Interaction Prediction System
+            </h1>
+            <p class="header__subtitle">
+                Advanced machine learning analysis for drug-food interactions using molecular descriptors and comprehensive nutritional data
+            </p>
+            <div class="header__disclaimer">
+                <i class="fas fa-exclamation-triangle"></i>
+                For demonstration purposes only. Always consult healthcare professionals for medical advice.
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="input-cards">
+                    <!-- Drug Input Card -->
+                    <div class="card input-card">
+                        <div class="card__header">
+                            <h3><i class="fas fa-pills"></i> Drug Information</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="form-group">
+                                <label for="drugName" class="form-label">Drug Name</label>
+                                <input 
+                                    type="text" 
+                                    id="drugName" 
+                                    class="form-control" 
+                                    placeholder="Enter drug name (e.g., aspirin, warfarin)"
+                                    autocomplete="off"
+                                >
+                                <small class="form-help">
+                                    Enter the generic name of the medication
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Food Input Card -->
+                    <div class="card input-card">
+                        <div class="card__header">
+                            <h3><i class="fas fa-apple-alt"></i> Food Information</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="form-group">
+                                <label for="foodName" class="form-label">Food Name</label>
+                                <input 
+                                    type="text" 
+                                    id="foodName" 
+                                    class="form-control" 
+                                    placeholder="Enter food name (e.g., apple, spinach)"
+                                    autocomplete="off"
+                                >
+                                <small class="form-help">
+                                    Enter the name of the food item
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Section -->
+                <div class="action-section">
+                    <button id="analyzeBtn" class="btn btn--primary btn--lg analyze-btn">
+                        <span class="btn-text">
+                            <i class="fas fa-search"></i>
+                            Analyze Interaction
+                        </span>
+                        <div class="btn-loader hidden">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Processing...
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section hidden">
+                <div class="results-container">
+                    <!-- Main Result Card -->
+                    <div class="card result-card">
+                        <div class="card__body">
+                            <div class="result-header">
+                                <div class="result-icon">
+                                    <i id="resultIcon" class="fas fa-circle"></i>
+                                </div>
+                                <div class="result-content">
+                                    <h3 id="resultTitle">Interaction Analysis Complete</h3>
+                                    <div class="result-effect">
+                                        <span class="effect-label">Predicted Effect:</span>
+                                        <span id="effectResult" class="effect-value">No Effect</span>
+                                    </div>
+                                    <div class="confidence-score">
+                                        <span class="confidence-label">Confidence:</span>
+                                        <div class="confidence-bar">
+                                            <div id="confidenceBar" class="confidence-fill"></div>
+                                            <span id="confidenceText" class="confidence-text">87%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="result-explanation">
+                                <p id="explanationText">
+                                    Analysis complete. Click below to view detailed information.
+                                </p>
+                            </div>
+                            <!-- Interaction Warnings -->
+                            <div id="interactionWarnings" class="interaction-warnings hidden">
+                                <div class="warning-header">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Important Nutrient Interactions</span>
+                                </div>
+                                <div id="warningContent" class="warning-content"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Information -->
+                    <div class="details-container">
+                        <!-- Drug Properties -->
+                        <div class="card details-card">
+                            <div class="card__header collapsible-header" data-target="drugDetails">
+                                <h4><i class="fas fa-atom"></i> Drug Molecular Properties</h4>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div id="drugDetails" class="card__body collapsible-content">
+                                <div class="properties-grid">
+                                    <div class="property-item">
+                                        <span class="property-label">Molecular Weight:</span>
+                                        <span id="molWeight" class="property-value">-</span>
+                                    </div>
+                                    <div class="property-item">
+                                        <span class="property-label">LogP:</span>
+                                        <span id="logP" class="property-value">-</span>
+                                    </div>
+                                    <div class="property-item">
+                                        <span class="property-label">H-Bond Acceptors:</span>
+                                        <span id="hba" class="property-value">-</span>
+                                    </div>
+                                    <div class="property-item">
+                                        <span class="property-label">H-Bond Donors:</span>
+                                        <span id="hbd" class="property-value">-</span>
+                                    </div>
+                                    <div class="property-item">
+                                        <span class="property-label">TPSA:</span>
+                                        <span id="tpsa" class="property-value">-</span>
+                                    </div>
+                                    <div class="property-item">
+                                        <span class="property-label">Rotatable Bonds:</span>
+                                        <span id="rotBonds" class="property-value">-</span>
+                                    </div>
+                                </div>
+                                <div class="smiles-container">
+                                    <span class="property-label">Canonical SMILES:</span>
+                                    <code id="canonicalSmiles" class="smiles-code">-</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Food Nutrients -->
+                        <div class="card details-card">
+                            <div class="card__header collapsible-header" data-target="foodDetails">
+                                <h4><i class="fas fa-leaf"></i> Food Nutritional Information</h4>
+                                <div class="nutrient-toggle">
+                                    <button id="toggleDetailedNutrients" class="btn btn--sm btn--outline">
+                                        <i class="fas fa-eye"></i> Show Detailed View
+                                    </button>
+                                </div>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div id="foodDetails" class="card__body collapsible-content">
+                                <!-- Macronutrients -->
+                                <div class="nutrient-category">
+                                    <div class="category-header">
+                                        <h5><i class="fas fa-weight"></i> Macronutrients</h5>
+                                        <small>Per 100g serving</small>
+                                    </div>
+                                    <div class="nutrients-grid">
+                                        <div class="nutrient-item" data-tooltip="Primary energy source for the body">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Carbohydrates</span>
+                                                <span id="carbs" class="nutrient-value">- g</span>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for muscle building and tissue repair">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Protein</span>
+                                                <span id="protein" class="nutrient-value">- g</span>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Important for hormone production and vitamin absorption">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Fat (Total)</span>
+                                                <span id="fat" class="nutrient-value">- g</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vitamins -->
+                                <div class="nutrient-category">
+                                    <div class="category-header">
+                                        <h5><i class="fas fa-pills"></i> Vitamins</h5>
+                                        <small>Essential micronutrients</small>
+                                    </div>
+                                    <div class="nutrients-grid">
+                                        <div class="nutrient-item" data-tooltip="Antioxidant that supports immune function and collagen synthesis">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin C</span>
+                                                <span id="vitC" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitCProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for bone health and calcium absorption">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin D</span>
+                                                <span id="vitD" class="nutrient-value">- µg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitDProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Important for nerve function and red blood cell formation">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin B12</span>
+                                                <span id="vitB12" class="nutrient-value">- µg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitB12Progress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Supports brain development and immune function">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin B6</span>
+                                                <span id="vitB6" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitB6Progress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for vision, immune function, and cell growth">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin A</span>
+                                                <span id="vitA" class="nutrient-value">- µg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitAProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Antioxidant that protects cells from damage">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin E</span>
+                                                <span id="vitE" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitEProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for blood clotting - important for anticoagulant interactions" data-interaction="true">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Vitamin K</span>
+                                                <span id="vitK" class="nutrient-value">- µg</span>
+                                                <i class="fas fa-exclamation-triangle interaction-warning"></i>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="vitKProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Important for DNA synthesis and cell division">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Folate</span>
+                                                <span id="folate" class="nutrient-value">- µg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="folateProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Minerals -->
+                                <div class="nutrient-category">
+                                    <div class="category-header">
+                                        <h5><i class="fas fa-gem"></i> Minerals</h5>
+                                        <small>Essential for body functions</small>
+                                    </div>
+                                    <div class="nutrients-grid">
+                                        <div class="nutrient-item" data-tooltip="Essential for bone health and muscle function - may affect absorption of certain medications" data-interaction="true">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Calcium</span>
+                                                <span id="calcium" class="nutrient-value">- mg</span>
+                                                <i class="fas fa-exclamation-triangle interaction-warning"></i>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="calciumProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for oxygen transport in blood">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Iron</span>
+                                                <span id="iron" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="ironProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Important for muscle and nerve function">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Magnesium</span>
+                                                <span id="magnesium" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="magnesiumProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for heart function and blood pressure regulation">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Potassium</span>
+                                                <span id="potassium" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="potassiumProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Important for fluid balance - limit intake for heart health">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Sodium</span>
+                                                <span id="sodium" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="sodiumProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential for immune function and wound healing">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Zinc</span>
+                                                <span id="zinc" class="nutrient-value">- mg</span>
+                                            </div>
+                                            <div class="nutrient-progress">
+                                                <div id="zincProgress" class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fat Breakdown (detailed view only) -->
+                                <div class="nutrient-category detailed-only hidden">
+                                    <div class="category-header">
+                                        <h5><i class="fas fa-oil-can"></i> Fat Breakdown</h5>
+                                        <small>Types of dietary fats</small>
+                                    </div>
+                                    <div class="nutrients-grid">
+                                        <div class="nutrient-item" data-tooltip="Should be limited for heart health">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Saturated Fat</span>
+                                                <span id="satFat" class="nutrient-value">- g</span>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Heart-healthy fat that may help reduce cholesterol">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Monounsaturated Fat</span>
+                                                <span id="monoFat" class="nutrient-value">- g</span>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Essential fatty acids important for brain function">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Polyunsaturated Fat</span>
+                                                <span id="polyFat" class="nutrient-value">- g</span>
+                                            </div>
+                                        </div>
+                                        <div class="nutrient-item" data-tooltip="Dietary cholesterol - limit intake for heart health">
+                                            <div class="nutrient-info">
+                                                <span class="nutrient-label">Cholesterol</span>
+                                                <span id="cholesterol" class="nutrient-value">- mg</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Model Information -->
+                        <div class="card details-card">
+                            <div class="card__header collapsible-header" data-target="modelDetails">
+                                <h4><i class="fas fa-brain"></i> Model Information</h4>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div id="modelDetails" class="card__body collapsible-content">
+                                <div class="model-info">
+                                    <div class="model-item">
+                                        <span class="model-label">Algorithm:</span>
+                                        <span class="model-value">Ensemble model(XGBoost+LGBoost+CATBoost)</span>
+                                    </div>
+                                    <div class="model-item">
+                                        <span class="model-label">Training Accuracy:</span>
+                                        <span class="model-value">93.8%</span>
+                                    </div>
+                                    <div class="model-item">
+                                        <span class="model-label">Features Used:</span>
+                                        <span class="model-value">2,082 molecular and nutritional descriptors</span>
+                                    </div>
+                                    <div class="model-item">
+                                        <span class="model-label">Classes:</span>
+                                        <span class="model-value">Harmful, Possible, Positive, No Effect</span>
+                                    </div>
+                                    <div class="model-item">
+                                        <span class="model-label">Enhanced Features:</span>
+                                        <span class="model-value">20 comprehensive nutrient parameters including vitamin and fat profiles</span>
+                                    </div>
+                                </div>
+                                <div class="disclaimer">
+                                    <p><strong>Important:</strong> This prediction model is for research purposes only. 
+                                    Always consult with healthcare professionals before making any decisions about 
+                                    drug-food interactions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clear Button -->
+                    <div class="action-section">
+                        <button id="clearBtn" class="btn btn--outline">
+                            <i class="fas fa-redo"></i>
+                            Analyze New Combination
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip hidden">
+        <div class="tooltip-content"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
