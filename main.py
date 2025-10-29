@@ -32,6 +32,13 @@ import logging
 from typing import Dict, List, Optional
 import aiohttp
 from urllib.parse import quote
+from fastapi.staticfiles import StaticFiles
+from huggingface_hub import hf_hub_download
+import joblib
+import logging
+
+logger = logging.getLogger(__name__)
+loaded_models = {}
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -43,6 +50,8 @@ app = FastAPI(
     description="API for predicting drug-food interactions using molecular descriptors and comprehensive nutritional data",
     version="2.0.0"
 )
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
+
 
 # Add CORS middleware
 app.add_middleware(
@@ -60,7 +69,7 @@ NCI_CONFIG = {
 }
 
 USDA_CONFIG = {
-    "key": os.getenv("USDA_API_KEY"),
+    "key": os.getenv("API_KEY"),
     "baseUrl": "https://api.nal.usda.gov/fdc/v1/",
     "searchEndpoint": "foods/search",
     "detailEndpoint": "food",
@@ -132,12 +141,19 @@ class InteractionResult(BaseModel):
 loaded_models = {}
 
 def load_models():
-    """Load the pre-trained models"""
     try:
-        loaded_models['xgb_model'] = joblib.load('xgb_model.joblib')
-        loaded_models['label_encoder'] = joblib.load('label_encoder.joblib')
-        loaded_models['feature_order'] = joblib.load('feature_order.joblib')
-        logger.info("Models loaded successfully")
+        # Download from Hugging Face Hub dynamically
+        loaded_models['xgb_model'] = joblib.load(
+            hf_hub_download(repo_id="asritha22bce/FoodDrugInteraction", filename="models/xgb_model.joblib")
+        )
+        loaded_models['label_encoder'] = joblib.load(
+            hf_hub_download(repo_id="asritha22bce/FoodDrugInteraction", filename="models/label_encoder.joblib")
+        )
+        loaded_models['feature_order'] = joblib.load(
+            hf_hub_download(repo_id="asritha22bce/FoodDrugInteraction", filename="models/feature_order.joblib")
+        )
+
+        logger.info("Models loaded successfully from Hugging Face Hub")
         return True
     except Exception as e:
         logger.error(f"Error loading models: {e}")
